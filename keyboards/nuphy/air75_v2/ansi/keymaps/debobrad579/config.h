@@ -1,0 +1,3 @@
+#define VIM_G_MOTIONS
+#define VIM_PASTE_BEFORE
+#define VIM_REPLACE
