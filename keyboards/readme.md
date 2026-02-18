@@ -1,36 +1,58 @@
-# Included Keyboards
+# Custom NuPhy Air75 V2 QMK Firmware
 
-QMK runs on a diverse range of keyboards. Some of these keyboards are well maintained and see constant community contributions, while others are part of the repository for historical reasons.
+Custom QMK firmware for the NuPhy Air75 V2, built on top of the official NuPhy firmware with a vim emulation layer (and additional remaps for productivity).
 
-## Official QMK Keyboards
+## Features
 
-### Ortholinear Keyboards - Jack Humbert
+- **Vim mode** — Full modal editing via [qmk-vim](https://github.com/andrewjrae/qmk-vim), toggled with `TOG_VIM` (`Esc`) on the Win/Linux layer
+- **VIA support** — Fully remappable via the VIA configurator
+- **Wireless** — Bluetooth (3 channels) and 2.4GHz RF support preserved from the stock firmware
+- **Custom keycodes** — Tab cycling, Windows Super key shortcuts, and more
 
-What makes OLKB keyboards shine is a combo of lean aesthetics, compact size, and killer tactile feel. These are available through [olkb.com](http://olkb.com) as well as through [Massdrop](http://massdrop.com) from time to time, as easy to assemble kits.
+## Layers
 
-* [Planck](/keyboards/planck/) &mdash; A 40% DIY powerhouse of customizability and modification capability. It's a lean, mean, typing machine.
-* [Preonic](/keyboards/preonic/) &mdash; Like the Planck, but bigger. 50%.
-* [Atomic](/keyboards/atomic/) &mdash; Imagine the size of the Planck. Now imagine the size of the Preonic. Now imagine _bigger_. That is the Atomic. A 60% keyboard.
+| # | Name | Activated By |
+|---|------|-------------|
+| 0 | Mac | Hardware switch |
+| 1 | Mac Fn | Hold `Fn` |
+| 2 | Win/Linux | Hardware switch |
+| 3 | Win/Linux Fn | Hold `Fn` |
+| 4 | Side LED control | Hold `m` from Fn layer |
 
-### Clueboard - Zach White
+## Custom Keycodes
 
-Designed and built in Felton, CA, Clueboards keyboard emphasize quality and locally sourced components.
+| Keycode | Action |
+|---------|--------|
+| `TOG_VIM` | Toggle vim mode |
+| `CT_TAB` | Ctrl+Tab (next tab) |
+| `CT_S_TAB` | Ctrl+Shift+Tab (previous tab) |
+| `SUPER_E` | Super+E (toggle i3 split) |
+| `SUPER_D` | Super+D (open rofi dmenu) |
+| `SUPER_M` | Super+M (toggle mic mute) |
+| `SUPER_N` | Super+N (notifications) |
 
-* [Clueboard](/keyboards/clueboard/66/) &mdash; The 66% custom keyboard.
-* [Cluecard](/keyboards/clueboard/card/) &mdash; A small board to help you hack on QMK.
-* [Cluepad](/keyboards/clueboard/17/) &mdash; A mechanical numpad with QMK superpowers.
+## Vim Mode
 
-### Moonlander, ErgoDox EZ and Planck EZ - ZSA Technology Labs
+Vim mode is powered by qmk-vim and activated with `TOG_VIM`. The left side LEDs indicate the current mode:
 
-[ZSA Technology Labs](https://zsa.io) maintains its own [fork of QMK](https://github.com/zsa/qmk_firmware) which feeds its [configurator](https://configure.zsa.io), for stability and legal purposes. The ZSA boards are:
+| Mode | Colour |
+|------|--------|
+| Normal | Blue |
+| Insert | Green |
+| Visual | Orange |
+| Visual Line | Purple |
 
-* [Moonlander Mark I](/keyboards/moonlander/) &mdash; A next-gen split, ergonomic keyboard with an active left side, USB type C, integrated wrist rest, and a thumb cluster that can move.
-* [ErgoDox EZ](/keyboards/ergodox_ez/) &mdash; A powerful split mechanical keyboard.
-* [Planck EZ](/keyboards/planck/ez) &mdash; A 40% DIY powerhouse of customizability and modification capability. It's a lean, mean, typing machine, which ships fully assembled with a two-year warranty.
+Enabled extensions: `VIM_G_MOTIONS`, `VIM_PASTE_BEFORE`, `VIM_REPLACE`
 
+## Building
 
-## Community-supported QMK Keyboards
+```bash
+qmk compile -kb nuphy/air75_v2/ansi -km debobrad579
+```
 
-These keyboards are part of the QMK repository, but their manufacturers are not official maintainers of the repository.
+## Flashing
 
-Since there are too many to list here and keep updated, please see the folder listing instead.
+Enter the bootloader by holding the top-left key (`Esc`) while plugging in the keyboard, then run:
+```bash
+qmk flash -kb nuphy/air75_v2/ansi -km debobrad579
+```
