@@ -16,15 +16,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "ansi.h"
-#include "uart.h"  // qmk uart.h
+#include "uart.h" // qmk uart.h
 #include "rf_driver.h"
 
 USART_MGR_STRUCT Usart_Mgr;
-#define RX_SBYTE    Usart_Mgr.RXDBuf[0]
-#define RX_CMD      Usart_Mgr.RXDBuf[1]
-#define RX_ACK      Usart_Mgr.RXDBuf[2]
-#define RX_LEN      Usart_Mgr.RXDBuf[3]
-#define RX_DAT      Usart_Mgr.RXDBuf[4]
+#define RX_SBYTE Usart_Mgr.RXDBuf[0]
+#define RX_CMD Usart_Mgr.RXDBuf[1]
+#define RX_ACK Usart_Mgr.RXDBuf[2]
+#define RX_LEN Usart_Mgr.RXDBuf[3]
+#define RX_DAT Usart_Mgr.RXDBuf[4]
 
 extern bool f_uart_ack;
 extern bool f_rf_read_data_ok;
@@ -66,13 +66,12 @@ uint16_t       host_last_consumer_usage(void);
 /**
  * @brief Uart auto nkey send
  */
-bool f_bit_kb_act = 0;
-static void uart_auto_nkey_send(uint8_t *pre_bit_report, uint8_t *now_bit_report, uint8_t size)
-{
+bool        f_bit_kb_act = 0;
+static void uart_auto_nkey_send(uint8_t *pre_bit_report, uint8_t *now_bit_report, uint8_t size) {
     uint8_t i, j, byte_index;
     uint8_t change_mask, offset_mask;
-    uint8_t key_code = 0;
-    bool f_byte_send = 0, f_bit_send = 0;
+    uint8_t key_code    = 0;
+    bool    f_byte_send = 0, f_bit_send = 0;
 
     if (pre_bit_report[0] ^ now_bit_report[0]) {
         bytekb_report_buf[0] = now_bit_report[0];
@@ -125,16 +124,14 @@ static void uart_auto_nkey_send(uint8_t *pre_bit_report, uint8_t *now_bit_report
     }
 }
 
-
 /**
  * @brief  Uart send keys report.
  */
-void uart_send_report_func(void)
-{
+void uart_send_report_func(void) {
     static uint32_t interval_timer = 0;
 
     if (dev_info.link_mode == LINK_USB) return;
-    keyboard_protocol          = 1;
+    keyboard_protocol = 1;
 
     if (timer_elapsed32(interval_timer) > 50) {
         interval_timer = timer_read32();
@@ -142,10 +139,8 @@ void uart_send_report_func(void)
             uart_send_report(CMD_RPT_BYTE_KB, bytekb_report_buf, 8);
             wait_us(200);
 
-            if(f_bit_kb_act)
-            uart_send_report(CMD_RPT_BIT_KB, uart_bit_report_buf, 16);
-        }
-        else {
+            if (f_bit_kb_act) uart_send_report(CMD_RPT_BIT_KB, uart_bit_report_buf, 16);
+        } else {
             f_bit_kb_act = 0;
         }
     }
@@ -207,11 +202,10 @@ void RF_Protocol_Receive(void) {
 
     if (Usart_Mgr.RXDState == RX_Done) {
         f_uart_ack = 1;
-        sync_lost = 0;
+        sync_lost  = 0;
 
         if (Usart_Mgr.RXDLen > 4) {
-            if((Usart_Mgr.RXDLen - 5) != RX_LEN) 
-                return;
+            if ((Usart_Mgr.RXDLen - 5) != RX_LEN) return;
 
             for (i = 0; i < RX_LEN; i++)
                 check_sum += Usart_Mgr.RXDBuf[4 + i];
@@ -223,8 +217,7 @@ void RF_Protocol_Receive(void) {
         } else if (Usart_Mgr.RXDLen == 3) {
             if (Usart_Mgr.RXDBuf[2] == 0xA0) {
                 f_uart_ack = 1;
-            }
-            else {
+            } else {
                 return;
             }
         } else {
@@ -263,8 +256,7 @@ void RF_Protocol_Receive(void) {
 
                     if (Usart_Mgr.RXDBuf[8] <= 100) dev_info.rf_baterry = Usart_Mgr.RXDBuf[8];
                     if (dev_info.rf_charge & 0x01) dev_info.rf_baterry = 100;
-                }
-                else {
+                } else {
                     if (dev_info.rf_state != RF_INVALID) {
                         if (error_cnt >= 5) {
                             error_cnt      = 0;
@@ -404,9 +396,9 @@ uint8_t uart_send_cmd(uint8_t cmd, uint8_t wait_ack, uint8_t delayms) {
         }
 
         case CMD_SET_24G_NAME: {
-            Usart_Mgr.TXDBuf[3]  = 44;  // uart data len
-            Usart_Mgr.TXDBuf[4]  = 44;  // name valid len
-            Usart_Mgr.TXDBuf[5]  = 3;   // 固定
+            Usart_Mgr.TXDBuf[3]  = 44; // uart data len
+            Usart_Mgr.TXDBuf[4]  = 44; // name valid len
+            Usart_Mgr.TXDBuf[5]  = 3;  // 固定
             Usart_Mgr.TXDBuf[6]  = 'N';
             Usart_Mgr.TXDBuf[8]  = 'u';
             Usart_Mgr.TXDBuf[10] = 'P';
@@ -428,7 +420,7 @@ uint8_t uart_send_cmd(uint8_t cmd, uint8_t wait_ack, uint8_t delayms) {
             Usart_Mgr.TXDBuf[42] = 'g';
             Usart_Mgr.TXDBuf[44] = 'l';
             Usart_Mgr.TXDBuf[46] = 'e';
-            Usart_Mgr.TXDBuf[48] = get_checksum(Usart_Mgr.TXDBuf + 4, Usart_Mgr.TXDBuf[3]);  // sum
+            Usart_Mgr.TXDBuf[48] = get_checksum(Usart_Mgr.TXDBuf + 4, Usart_Mgr.TXDBuf[3]); // sum
             break;
         }
 
@@ -485,8 +477,7 @@ void dev_sts_sync(void) {
         wait_ms(50);
         writePinHigh(NRF_RESET_PIN);
         wait_ms(50);
-    }
-    else if (f_send_channel) {
+    } else if (f_send_channel) {
         f_send_channel = 0;
         uart_send_cmd(CMD_SET_LINK, 10, 10);
     }
@@ -498,8 +489,7 @@ void dev_sts_sync(void) {
             break_all_key();
         }
         rf_blink_cnt = 0;
-    }
-    else {
+    } else {
         if (host_mode != HOST_RF_TYPE) {
             host_mode = HOST_RF_TYPE;
             break_all_key();
@@ -508,14 +498,13 @@ void dev_sts_sync(void) {
 
         if (dev_info.rf_state != RF_CONNECT) {
             if (disconnect_delay >= 10) {
-                rf_blink_cnt    = 3;
+                rf_blink_cnt      = 3;
                 rf_link_show_time = 0;
-                link_state_temp = dev_info.rf_state;
+                link_state_temp   = dev_info.rf_state;
             } else {
                 disconnect_delay++;
             }
-        }
-        else if (dev_info.rf_state == RF_CONNECT) {
+        } else if (dev_info.rf_state == RF_CONNECT) {
             rf_linking_time  = 0;
             disconnect_delay = 0;
             rf_blink_cnt     = 0;
@@ -524,9 +513,8 @@ void dev_sts_sync(void) {
                 link_state_temp   = RF_CONNECT;
                 rf_link_show_time = 0;
                 if (dev_info.link_mode == LINK_RF_24) {
-                    uart_send_cmd(CMD_SET_24G_NAME, 10, 30);   
+                    uart_send_cmd(CMD_SET_24G_NAME, 10, 30);
                 }
-
             }
         }
     }
@@ -547,28 +535,12 @@ void dev_sts_sync(void) {
  * @param Length data length
  */
 void UART_Send_Bytes(uint8_t *Buffer, uint32_t Length) {
-    if(uart_repeat_flag) {
-        for(uint8_t i = 0;i<3;i++)
-        {
-            writePinLow(NRF_WAKEUP_PIN);
-            wait_us(50);
-        
-            uart_transmit(Buffer, Length);
-        
-            wait_us(50 + Length * 32);
-            writePinHigh(NRF_WAKEUP_PIN);  
-        
-            wait_us(200);      
-        }        
-    } else {
-            writePinLow(NRF_WAKEUP_PIN);
-            wait_us(50);
-        
-            uart_transmit(Buffer, Length);
-        
-            wait_us(50 + Length * 32);
-            writePinHigh(NRF_WAKEUP_PIN);          
-    }
+    writePinLow(NRF_WAKEUP_PIN);
+    wait_us(50);
+    uart_transmit(Buffer, Length);
+    wait_us(50 + Length * 32);
+    writePinHigh(NRF_WAKEUP_PIN);
+    wait_us(200);
 }
 
 /**
@@ -607,44 +579,39 @@ void uart_send_report(uint8_t report_type, uint8_t *report_buf, uint8_t report_s
     memcpy(&Usart_Mgr.TXDBuf[4], report_buf, report_size);
     Usart_Mgr.TXDBuf[4 + report_size] = get_checksum(&Usart_Mgr.TXDBuf[4], report_size);
 
-    uart_repeat_flag = 1;
-
     UART_Send_Bytes(&Usart_Mgr.TXDBuf[0], report_size + 5);
-
-    uart_repeat_flag = 0;
-
-    wait_us(200);
 }
 
 /**
  * @brief Uart receives data and processes it after completion,.
  */
 void uart_receive_pro(void) {
-    static bool rcv_start = false;
+    static bool     rcv_start = false;
+    static uint32_t rcv_timer = 0;
 
-    // Receiving serial data from RF module
-    while (uart_available()) {
-        rcv_start = true;
+    if (timer_elapsed32(rcv_timer) < 1) return;
 
-        if (Usart_Mgr.RXDLen >= UART_MAX_LEN) {
-            uart_read();
+    if (uart_available()) {
+        wait_us(200);
+        while (uart_available()) {
+            uint8_t byte = uart_read();
+            if (byte == UART_HEAD) {
+                rcv_start = true;
+            }
+            if (rcv_start && Usart_Mgr.RXDLen < UART_MAX_LEN) {
+                Usart_Mgr.RXDBuf[Usart_Mgr.RXDLen++] = byte;
+            }
+            // don't do any waits in here, board seems to crash
         }
-        else {
-            Usart_Mgr.RXDBuf[Usart_Mgr.RXDLen++] = uart_read();
-        }
 
-        if (!uart_available()) {
-            wait_us(200);
+        if (rcv_start) {
+            rcv_start          = false;
+            Usart_Mgr.RXDState = RX_Done;
+            RF_Protocol_Receive();
+            Usart_Mgr.RXDLen = 0;
         }
     }
-
-    // Processing received serial port protocol
-    if (rcv_start) {
-        rcv_start          = false;
-        Usart_Mgr.RXDState = RX_Done;
-        RF_Protocol_Receive();
-        Usart_Mgr.RXDLen   = 0;
-    }
+    rcv_timer = timer_read32();
 }
 
 /**
